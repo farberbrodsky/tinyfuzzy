@@ -1,32 +1,37 @@
 #include <stdio.h>
 #include "tinyfuzzy.h"
 
-int main() {
-    printf("Hello!\n");
-    char *haystack = "AAAAATGTTACGG";
-    char   *needle = "GGTTGACTA";
+int main(int argc, char **argv) {
+    // char *haystack = "ABCDEFGHIJ";
+    // char   *needle = "AAACCDFFGHHIJ";
+    if (argc < 3) {
+        printf("No!\n");
+        return 1;
+    }
+    char *haystack = argv[1];
+    char   *needle = argv[2];
     struct TinyFuzzy_Result r = TinyFuzzy_search(haystack, needle);
     enum TinyFuzzy_Op *opp = r.ops;
-    printf("Start at index %zu\n", r.match_start);
+
+    printf("Start at index %zu, %zu\n", r.haystack_match_start, r.needle_match_start);
     while (*opp != TinyFuzzy_Op_END) {
         switch (*opp) {
             case TinyFuzzy_Op_KEEP:
-                puts("Keep");
+                printf("   Keep %c  %c\n", needle[r.needle_match_start++], haystack[r.haystack_match_start++]);
                 break;
             case TinyFuzzy_Op_REPLACE:
-                puts("Replace");
+                printf("Replace %c->%c\n", needle[r.needle_match_start++], haystack[r.haystack_match_start++]);
                 break;
             case TinyFuzzy_Op_OMIT:
-                puts("Omit");
+                printf("   Omit %c\n", needle[r.needle_match_start++]);
                 break;
             case TinyFuzzy_Op_INSERT:
-                puts("Insert");
+                printf(" Insert %c\n", needle[r.needle_match_start++]);
                 break;
             default:
-                puts("WTF!");
-                printf("*opp %d\n", *opp);
                 break;
         }
         ++opp;
     }
+    return 0;
 }

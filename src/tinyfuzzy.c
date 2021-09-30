@@ -3,6 +3,8 @@
 
 struct TinyFuzzy_Result TinyFuzzy_search(char *haystack, char *needle) {
     struct TinyFuzzy_Result res;
+    res.haystack_match_start = 0;
+    res.needle_match_start = 0;
 
     size_t haystack_len = strlen(haystack);
     size_t needle_len = strlen(needle);
@@ -60,8 +62,6 @@ struct TinyFuzzy_Result TinyFuzzy_search(char *haystack, char *needle) {
         }
     }
 
-    printf("Best is %zu\n", max_option);
-
     // allocate ops based on theoretical maximum size
     // we will memmove it later
     size_t max_i_j = (max_j > max_i) ? max_j : max_i;
@@ -73,7 +73,8 @@ struct TinyFuzzy_Result TinyFuzzy_search(char *haystack, char *needle) {
     while (max_i > 0 && max_j > 0) {
         size_t target = scores[max_i + (needle_len + 1) * max_j];
         if (target == 0) {
-            res.match_start = max_j - 1;
+            res.haystack_match_start = max_j;
+            res.needle_match_start = max_i;
             break;
         }
 
@@ -84,6 +85,8 @@ struct TinyFuzzy_Result TinyFuzzy_search(char *haystack, char *needle) {
         } else {
             some_option -= 3;
         }
+        if (some_option < 0) some_option = 0;
+
         if (some_option == target) {
             max_i -= 1; max_j -= 1;
             ops_len++;

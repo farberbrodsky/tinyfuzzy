@@ -1,8 +1,8 @@
 #include <stdlib.h>
-#include <stdio.h>
 
 struct TinyFuzzy_Result {
-    size_t match_start;
+    size_t haystack_match_start;
+    size_t needle_match_start;
 
     enum TinyFuzzy_Op {
         TinyFuzzy_Op_END = 0,
